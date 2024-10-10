@@ -72,69 +72,100 @@ function parse_problem(com_name, problem) {
 	let problem_msg = ""; 
 	switch(com_name) {
 		case "asy":
-			problem_msg = "Cycle detected<br/>";
+			problem_msg = "Cycle detected:<br/>";
+			problem_msg += parse_cycle(problem);
+			
 			break;
 		case "pp":
-			problem_msg = "Problematic messages<br/>"
+			problem_msg = "Problematic messages:<br/>";
+			problem_msg += problem.join(",");
+			change_color(problem[0]);
+			change_color(problem[1]);
 			break;
 		case "co":
-			problem_msg = "Problematic messages<br/>"
+			problem_msg = "Problematic messages:<br/>";
+			problem_msg += problem.join(",");
+			change_color(problem[0]);
+			change_color(problem[1]);
 			break;
 		case "mb":
-			problem_msg = "Cycle detected<br/>";
+			problem_msg = "Cycle detected:<br/>";
+			problem_msg += parse_cycle(problem);
 			break;
 		case "onen":
 			problem_msg = "Cycle detected<br/>";
+			problem_msg += parse_cycle(problem);
 			break;
 		case "nn":
 			problem_msg = "Cycle detected<br/>";
-			break;
+			problem_msg += parse_cycle(problem);
+			break;	
 		case "rsc":
-			if(Array.isArray(problem)) {
-				problem_msg = "Crown detected<br/>";
+			if (problem?.[Symbol.iterator]) {
+				problem_msg = "Crown detected :<br/>";
+				problem_msg += parse_cycle(problem);
 			} else {
-				problem_msg = "Crown or Unmatch message detected<br/>";
+				problem_msg = "Unmatch message detected :<br/>"
+				problem_msg += (Object.values(problem)[2][2]);
+				change_color(Object.values(problem)[2][2])
 			}
+			
 			break;
+
+	}
+
+	function change_color(message) {
+		let xs = -1;
+		let ys = -1;
+		let xr = -1;
+		let yr = -1;
+		let dashed = false;
+		for (let i = 0; i < nodes.length; i++) {
+			if (("m".concat(nodes[i].m)).localeCompare(message)==0){
+				if (nodes[i].type == "send") {
+					drawCircle(ctx, nodes[i].x, nodes[i].y, R, "red", STROKE);
+					xs = nodes[i].x;
+					ys = nodes[i].y;
+				} else if (nodes[i].unmatched) {
+					console.log(nodes);	
+					drawCircle(ctx, nodes[i].x, nodes[i].y, R, "coral", STROKE);
+					xr = nodes[i].x + (trg.x-src.x) > 0 ? -(R*1.5) : (R*1.5);
+					yr = nodes[i].y + (trg.y-src.y) > 0 ? -(R*1.5*tg) : (R*1.5*tg);
+					dashed = true;
+				} else {
+					drawCircle(ctx, nodes[i].x, nodes[i].y, R, "coral", STROKE);
+					xr = nodes[i].x;
+					yr = nodes[i].y;
+				}
+			}
+		}
+		drawArrow(ctx, xs, ys, xr, yr, "#000", STROKE, dashed); 
 	}
 
 	function parse_cycle(problem) {
-		let cycle = problem;
-		let complete_cycle = [...cycle];
-		complete_cycle = parse_events(complete_cycle);
+		let output = "";
+		let cycle = [];
 	
-		let cycle_msg = "Cycle detected:<br/>" + 
-			complete_cycle.join("->");
-
-		return cycle_msg;
-	}
-	function parse_events(events) {
-		let parsed_events = events.map((id) => {
-			let msg = getNodeById(id).m;
-			if(id % 2 == 0) // send
-				return "!" + msg;
-			else  // receive
-				return "?" + msg;
-		});
-	
-		return parsed_events;
+		for (let r of problem) {
+			let relation = Object.values(r)[2];
+			let evenement = Object.values(relation[1]);
+			if (evenement[1] == "s") {
+				cycle.push("!" + evenement[2][2]);
+			} else {
+				cycle.push("?" + evenement[2][2]);
+			}
+			change_color(evenement[2][2]);
+		}
+		for (let evenement of cycle) {
+			output += evenement + " -> ";
+		}
+		output += cycle[0];
+		return output;
 	}
 
 	return problem_msg;
 }
 
-function print_cycle(cycle) {
-	let complete_cycle = [...cycle];
-	complete_cycle = complete_cycle.map((id) => {
-		let msg = getNodeById(id).m;
-		if(id % 2 == 0) // send
-			return "!" + msg;
-		else  // receive
-			return "?" + msg;
-	});
-
-	return complete_cycle.join("->");
-}
 
 function clear_table() {
 	asy.innerHTML = "";

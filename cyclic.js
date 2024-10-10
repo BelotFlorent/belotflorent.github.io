@@ -1,118 +1,28 @@
 // A JavaScript Program to detect cycle in a graph
-var prolog_code = "process_rel(X,Z) :- process_rel(X,Y), process_rel(Y,Z).\n\
-match(s(X,Y,Z), r(X,Y,Z)) :- event(s(X,Y,Z)), event(r(X,Y,Z)).\n\
-rel(X,Y) :- process_rel(X,Y).\n\
-rel(X,Y) :- match(X,Y).\n\
-rel(X,Z) :- rel(X,Y), rel(Y,Z).\n\
-\n\
-%---ASY---\n\
-envoie_correct :- event(s(X,X,_)),!, fail.\n\
-envoie_correct.\n\
-reception_correct :- event(r(X,Y,Z)), \\+event(s(X,Y,Z)), !, fail.\n\
-reception_correct.\n\
-cycle :- rel(X,X).\n\
-\n\
-asy :- \\+cycle, reception_correct, envoie_correct.\n\
-\n\
-%---P2P---\n\
-cond_err_p2p(s(X,Y,M1), s(X,Y,M2)) :- match(s(X,Y,M1), R1), match(s(X,Y,M2), R2), process_rel(R2,R1), !.\n\
-cond_err_p2p(S1, S2) :- \\+match(S1, _), match(S2, _), !.\n\
-cond_err_p2p(_,_) :- !, fail.\n\
-\n\
-err_p2p :- event(s(X,Y,M1)), event(s(X,Y,M2)), M1\\=M2, process_rel(s(X,Y,M1), s(X,Y,M2)), cond_err_p2p(s(X,Y,M1),s(X,Y,M2)).\n\
-\n\
-p2p :- asy,\\+err_p2p.\n\
-\n\
-%---CO---\n\
-\n\
-cond_err_co(s(X,Y,M1), s(Z,Y,M2)) :- match(s(X,Y,M1), R1), match(s(Z,Y,M2), R2), process_rel(R2,R1), !.\n\
-cond_err_co(S1, S2) :- \\+match(S1, _), match(S2, _), !.\n\
-cond_err_co(_,_) :- !, fail.\n\
-\n\
-err_co :- event(s(X,Y,M1)), event(s(Z,Y,M2)), M1\\=M2, rel(s(X,Y,M1), s(Z,Y,M2)), cond_err_co(s(X,Y,M1),s(Z,Y,M2)).\n\
-\n\
-co :- asy,\\+err_co.\n\
-\n\
-%---MB---\n\
-\n\
-mb_rel(s(X,Y,M1),s(Z,Y,M2)) :- match(s(X,Y,M1),_), event(s(Z,Y,M2)), M1\\=M2, \\+match(s(Z,Y,M2),_).\n\
-mb_rel(s(X,Y,M1),s(Z,Y,M2)) :- match(s(X,Y,M1), R1), match(s(Z,Y,M2), R2), process_rel(R1, R2).\n\
-\n\
-mb_order(X,Y) :- rel(X,Y).\n\
-mb_order(X,Y) :- mb_rel(X,Y).\n\
-mb_order(X,Z) :- mb_order(X,Y), mb_order(Y,Z).\n\
-err_mb :- mb_order(X,X).\n\
-\n\
-mb :- \\+err_mb.\n\
-\n\
-%---1-N---\n\
-\n\
-onen_rel(s(X,Y,M1),s(X,Z,M2)) :- match(s(X,Y,M1),_), event(s(X,Z,M2)), M1\\=M2, \\+match(s(X,Z,M2),_).\n\
-onen_rel(r(X,Y,M1),r(X,Z,M2)) :- match(S1, r(X,Y,M1)), match(S2, r(X,Z,M2)), process_rel(S1, S2).\n\
-\n\
-onen_order(X,Y) :- rel(X,Y).\n\
-onen_order(X,Y) :- onen_rel(X,Y).\n\
-onen_order(X,Z) :- onen_order(X,Y), onen_order(Y,Z).\n\
-err_onen :- onen_order(X,X).\n\
-\n\
-onen :- \\+err_onen.\n\
-\n\
-%---N-N---\n\
-\n\
-onen_mb_order(X,Y) :- rel(X,Y).\n\
-onen_mb_order(X,Y) :- mb_rel(X,Y).\n\
-onen_mb_order(X,Y) :- onen_rel(X,Y).\n\
-onen_mb_order(X,Z) :- onen_mb_order(X,Y), onen_mb_order(Y,Z).\n\
-\n\
-nn_rel(X,Y) :- onen_mb_order(X,Y).\n\
-\n\
-nn_rel(r(X,Y,M1), r(Z,N,M2)) :- match(S1, r(X,Y,M1)), match(S2, r(Z,N,M2)), M1\\=M2, onen_mb_order(S1, S2), \\+onen_mb_order(r(X,Y,M1),r(Z,N,M2)).\n\
-\n\
-nn_rel(s(X,Y,M1), s(Z,N,M2)) :- match(s(X,Y,M1), R1), match(s(Z,N,M2), R2), M1\\=M2, onen_mb_order(R1, R2), \\+onen_mb_order(s(X,Y,M1),s(Z,N,M2)).\n\
-\n\
-nn_rel(s(X,Y,M1),s(Z,N,M2)) :- match(s(X,Y,M1),_), event(s(Z,N,M2)), \\+match(s(Z,N,M2),_), \\+onen_mb_order(s(X,Y,M1),s(Z,N,M2)).\n\
-nn_rel(r(X,Y,M1),s(Z,N,M2)) :- match(_,r(X,Y,M1)), event(s(Z,N,M2)), \\+match(s(Z,N,M2),_), \\+onen_mb_order(r(X,Y,M1),s(Z,N,M2)).\n\
-\n\
-nn_rel(X,Z) :- nn_rel(X,Y), nn_rel(Y,Z).\n\
-\n\
-err_nn :- nn_rel(X,X).\n\
-\n\
-nn :- \\+err_nn.\n\
-\n\
-%---RSC---\n\
-\n\
-crown_rel(s(X,Y,M1), s(Z,N,M2)) :- match(s(Z,N,M2), R2), event(s(X,Y,M1)), M1\\=M2, rel(s(X,Y,M1), R2).\n\
-\n\
-crown_rel_transitive(X,Y) :- crown_rel(X,Y).\n\
-crown_rel_transitive(X,Z) :- crown_rel(X,Y), crown_rel_transitive(Y,Z).\n\
-\n\
-crown :- crown_rel(X,Y), crown_rel_transitive(Y,X), X\\=Y.\n\
-\n\
-unmatch(s(X,Y,M)) :- event(s(X,Y,M)), \\+match(s(X,Y,M),_), !.\n\
-unmatch(_) :- fail.\n\
-\n\
-rsc :- \\+crown, \\+unmatch(_).\n";
 
 class DependencyGraph {
 	nodes = [];
 	events;
-	string_prolog = ":- table rel/2, process_rel/2, mb_order/2, onen_order/2, onen_mb_order/2, nn_rel/2, crown_rel_transitive/2.\n";
+	string_prolog = ":- table process_rel/2, rel/3, mb_order/3, onen_order/3, onen_mb_order/2, nn_rel/3, crown_rel_transitive/3.\n";
 	session;
 
 
 	constructor(nodes, draw_edges, events) {
 		this.nodes = nodes;
 		this.events = events;
-		this.string_prolog += this.make_string(nodes, draw_edges, events)+prolog_code;
-		
-		//console.log(this.string_prolog+prolog_code);
-		
 	}
 
+	async load_code() {
+		var code = "";
+		await fetch('msc.pl')
+		.then(response => response.text())
+		.then((data) => {
+			this.string_prolog += this.make_string(nodes, draw_edges, events)+data;
+		})
+	}
 
 	async initalize() {
-		console.log("TTT5T\n");	
-		
+		await this.load_code();
 		
 		let Module = {
 			locateFile: (file) => file
@@ -128,14 +38,7 @@ class DependencyGraph {
 
 		await this.session.load_string(this.string_prolog);
 
-		let result = this.session.query("nn.").once();
-		console.log(result);
-
 	}
-
-		
-		
-	
 
 	make_string(nodes, draw_edges, events) {
 		let list_event = [];
@@ -192,15 +95,25 @@ class DependencyGraph {
 	async isMSC() {
 		var result = [false, ""];
 		
-		result[0] = this.session.query("asy.").once().success;
+		var query_obj = this.session.query("asy(A).").once();
+		if (query_obj.success) {
+			result = [false, query_obj["A"]];
+		} else {
+			result = [true, ""];
+		}
 
 		console.log("asy : " + result[0] + "\n");
 		return result;
 	}
 	async ispp() {
 		var result = [false, ""];
-		
-		result[0] = this.session.query("p2p.").once().success;
+
+		var query_obj = this.session.query("pp(A).").once();
+		if (query_obj.success) {
+			result = [false, query_obj["A"]];
+		} else {
+			result = [true, ""];
+		}
 
 		console.log("pp : " + result[0] + "\n");
 		return result;
@@ -208,7 +121,12 @@ class DependencyGraph {
 	async isco() {
 		var result = [false, ""];
 		
-		result[0] = this.session.query("co.").once().success;
+		var query_obj = this.session.query("co(A).").once();
+		if (query_obj.success) {
+			result = [false, query_obj["A"]];
+		} else {
+			result = [true, ""];
+		}
 
 		console.log("co : " + result[0] + "\n");
 		return result;
@@ -216,7 +134,12 @@ class DependencyGraph {
 	async ismb() {
 		var result = [false, ""];
 		
-		result[0] = this.session.query("mb.").once().success;
+		var query_obj = this.session.query("mb(A).").once();
+		if (query_obj.success) {
+			result = [false, query_obj["A"]];
+		} else {
+			result = [true, ""];
+		}
 
 		console.log("mb : " + result[0] + "\n");
 		return result;
@@ -224,7 +147,12 @@ class DependencyGraph {
 	async isonen() {
 		var result = [false, ""];
 		
-		result[0] = this.session.query("onen.").once().success;
+		var query_obj = this.session.query("onen(A).").once();
+		if (query_obj.success) {
+			result = [false, query_obj["A"]];
+		} else {
+			result = [true, ""];
+		}
 
 		console.log("onen : " + result[0] + "\n");
 		return result;
@@ -232,7 +160,12 @@ class DependencyGraph {
 	async isnn() {
 		var result = [false, ""];
 		
-		result[0] = this.session.query("nn.").once().success;
+		var query_obj = this.session.query("nn(A).").once();
+		if (query_obj.success) {
+			result = [false, query_obj["A"]];
+		} else {
+			result = [true, ""];
+		}
 
 		console.log("nn : " + result[0] + "\n");
 		return result;
@@ -240,7 +173,12 @@ class DependencyGraph {
 	async isrsc() {
 		var result = [false, ""];
 		
-		result[0] = this.session.query("rsc.").once().success;
+		var query_obj = this.session.query("rsc(A).").once();
+		if (query_obj.success) {
+			result = [false, query_obj["A"]];
+		} else {
+			result = [true, ""];
+		}
 
 		console.log("rsc : " + result[0] + "\n");
 		return result;
