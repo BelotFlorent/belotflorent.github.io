@@ -6,7 +6,8 @@ match(s(X,Y,Z), r(X,Y,Z)) :- event(s(X,Y,Z)), event(r(X,Y,Z)).
 rel2(X,Y) :- process_rel(X,Y).
 rel2(X,Y) :- match(X,Y).
 
-rel(X, Z) :- rel2(X, Y), rel2(Y, Z).
+rel(X, Y) :- rel2(X, Y).
+rel(X, Z) :- rel(X, Y), rel(Y, Z).
 
 rel(X, Y, [(X,Y)]) :- rel2(X, Y).
 rel(X, Z, [(X,Z)|A]) :- rel(X, Y, A), rel2(Y, Z), \+memberchk((X, Z), A).
