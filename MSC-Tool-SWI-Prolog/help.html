@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <title>MSC Tool instructions</title>
+    <style>
+
+
+        #toolpic {
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+    
+        #toolpic:hover {
+            filter: blur(1px);
+        }
+    
+        /* The Modal (background) */
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1;
+            /* Sit on top */
+            padding-top: 100px;
+            /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.9);
+            /* Black w/ opacity */
+            overflow-y: hidden; /* Hide vertical scrollbar */
+        }
+    
+        /* Modal Content (image) */
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+    
+        /* Caption of Modal Image */
+        #caption {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            height: 150px;
+        }
+    
+        /* Add Animation */
+        .modal-content,
+        #caption {
+            -webkit-animation-name: zoom;
+            -webkit-animation-duration: 0.6s;
+            animation-name: zoom;
+            animation-duration: 0.6s;
+        }
+    
+        @-webkit-keyframes zoom {
+            from {
+                -webkit-transform: scale(0)
+            }
+    
+            to {
+                -webkit-transform: scale(1)
+            }
+        }
+    
+        @keyframes zoom {
+            from {
+                transform: scale(0)
+            }
+    
+            to {
+                transform: scale(1)
+            }
+        }
+    
+        /* The Close Button */
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+    
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    
+        /* 100% Image Width on Smaller Screens */
+        @media only screen and (max-width: 700px) {
+            .modal-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-4">
+        <div class="row mb-2">
+            <div class="col">
+                <h2>Drawing an MSC</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <p>Use the <strong>Processes</strong> control to specify the desired number of processes, then click the <strong>Update</strong> button to change the drawing accordingly. Now you can:</p>
+                <ul>
+                    <li>
+                        <span class="text-info"><strong>Add a message</strong></span>: first, make sure the <strong>Add</strong> option is selected (gray background). Next, you can either choose to add a matched or an unmatched message using the <strong>Matched</strong>/<strong>Unmatched</strong> selector. To draw the message, <em>right click</em> in the drawing on the sender process; you can now freely move around both the send and the receive events by dragging the two respective circles<sup>1</sup>.
+                    </li>
+                    <li>
+                        <span class="text-info"><strong>Remove a message</strong></span>: first, make sure the <strong>Remove</strong> option is selected (gray background). Now, just <em>right click</em> on either the send or the receive event of the message you want to remove. If you want to remove all the messages on the drawing, just click the <span class="px-2 pb-1 rounded bg-warning">Clear</span> button.
+                    </li>
+                </ul>
+                <p><sup>1</sup> <span class="text-muted">For every matched message, a white circle will denote the send event, and a green circle is used for the receive event. For unmatched messages, a gray circle is used on the receiving end (recall that formally an unmatched message does not have a receive event).</span></p>      
+            </div>
+            <div class="col-md-6 ml-auto pl-3 pt-3">
+                <figure class="figure">
+                    <img id="toolpic" src="img/tool_7_rounded.png" class="figure-img img-fluid">
+                    <figcaption class="figure-caption text-center">The main interface of the tool. Click the image to enlarge it.</figcaption>
+                </figure>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col">
+                <h2>Analyzing an MSC</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <p>Given an MSC, the tool is able to analyze it and see to which classes of communication models it belongs. To do so, simply draw the desired MSC and then click the <span class="px-2 pb-1 rounded" style="background-color: #62f578;">Analyze MSC</span> button. The results will be shown in the "Communication models" table on the right. If the MSC does not belong to some classes, the tool will also provide a hint of why that is, which is accessible by hovering the mouse over the info icon (<i class="fas fa-info-circle"></i>).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImg">
+        <div id="caption"></div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <!-- Modal script -->
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+        
+        // Get the image and insert it inside the modal - use its "alt" text as a caption
+        var img = document.getElementById("toolpic");
+        var modalImg = document.getElementById("modalImg");
+        img.onclick = function(){
+          modal.style.display = "block";
+          modalImg.src = "img/tool_7.jpg";
+        }
+        // img.onclick = function(){
+        //   modal.style.display = "block";
+        //   modalImg.src = this.src;
+        // }
+        
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+        
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() { 
+          modal.style.display = "none";
+        }
+    </script>
+</body>
+<footer>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</footer>
+
+</html>
