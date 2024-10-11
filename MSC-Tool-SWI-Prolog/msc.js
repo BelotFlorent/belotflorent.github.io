@@ -138,7 +138,6 @@ function parse_problem(com_name, problem) {
 			let tg = sin/cos;
 			xr = trg.x + ((trg.x-src.x) > 0 ? -(R*1.5) : (R*1.5));
 			yr = trg.y + ((trg.y-src.y) > 0 ? -(R*1.5*tg) : (R*1.5*tg));
-			dashed = true;
 		} else {
 			xr = trg.x;
 			yr = trg.y;
